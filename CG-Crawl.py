@@ -33,7 +33,6 @@ def get_category_data(catid):
 
 
 for parent in parents:
-	continue
 	for collection in get_category_data(parent):
 		if 'template' not in collection: continue
 		id = collection['id']
