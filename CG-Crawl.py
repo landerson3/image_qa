@@ -67,7 +67,7 @@ class rh_atg_wrapper():
 		data = requests.get(f'https://rh.com/rh/api/category/collectiongallery/v1/{catid}', headers = headers).json()
 		if 'totalNumRecs' not in data:
 			yield None
-		if data['totalNumRecs']>=1:
+		elif data['totalNumRecs']>=1:
 			for collx in data['collectionGallery']:
 				yield collx
 				if collx['id'] == catid: continue ## this avoids infinite loop
