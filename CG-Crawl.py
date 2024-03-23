@@ -112,14 +112,15 @@ class rh_atg_wrapper():
 		return result
 	
 	def product_image_check(self, parent_collection_id: str|list = LEFT_NAVS) -> None:
-		if type(parent_collection_id) == list:
+		if type(parent_collection_id) in (list,tuple):
 			for id in parent_collection_id:
 				self.product_image_check(id)
 				return
 		else:
 			for i in self.check_category_product_images(parent_collection_id):
 				with open(os.path.expanduser("~/Desktop/product_image_check.csv"),"a") as csv:
-					csv.write(f'{",".join(i)}\n')
+					line = f'''{i[0]},{i[1]},"{",".join(i[2])}"\n'''
+					csv.write(line)
 
 
 	def cg_check(self, parent_collection_id: str|int|list|tuple = LEFT_NAVS) -> None:
@@ -134,6 +135,7 @@ class rh_atg_wrapper():
 		for collection in self.get_category_data(parent_collection_id):
 			if 'template' not in collection: continue
 			if 'cgBannerTemplate' not in collection: continue
+			if collection['active'] == False: continue
 			id = collection['id']
 			banner = collection['cgBannerImage']
 			if banner not in ('',None):
@@ -142,7 +144,7 @@ class rh_atg_wrapper():
 				imagecheck = self.image_exist(id)
 			with open(os.path.expanduser('~/Desktop/cg_check.csv'),'a') as cg_csv:
 				banner = collection['cgBannerImage'].replace(",","\\,")
-				cg_csv.write(f'''{collection['displayName']},{collection['id']},"{banner}",{imagecheck}\n''')
+				cg_csv.write(f'''{collection['id']},{collection['type']},{collection['displayName']},"{banner}",{imagecheck}\n''')
 
 
 
