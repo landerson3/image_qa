@@ -67,7 +67,7 @@ class rh_atg_wrapper():
 		data = requests.get(f'https://rh.com/rh/api/category/collectiongallery/v1/{catid}', headers = headers).json()
 		if 'totalNumRecs' not in data:
 			yield None
-		elif data['totalNumRecs']>=1:
+		if data['totalNumRecs']>=1:
 			for collx in data['collectionGallery']:
 				yield collx
 				if collx['id'] == catid: continue ## this avoids infinite loop
@@ -213,9 +213,14 @@ class rh_atg_wrapper():
 				self.cg_check(col)
 		for collection in self.get_category_data(parent_collection_id):
 			if collection == None: continue
+			if collection == None: continue
 			if 'template' not in collection: continue
 			if 'cgBannerTemplate' not in collection: continue
 			if collection['active'] == False: continue
+			if 'collection' in collection and not collection['collection']:
+				continue
+			if collection['linkType'] == 'anchor':
+				continue
 			if 'collection' in collection and not collection['collection']:
 				continue
 			if collection['linkType'] == 'anchor':
@@ -226,6 +231,10 @@ class rh_atg_wrapper():
 				imagecheck = self.image_exist(banner)
 			else:
 				imagecheck = self.image_exist(id)
+			if not imagecheck:
+				with open(os.path.expanduser('~/Desktop/cg_check.csv'),'a') as cg_csv:
+					banner = collection['cgBannerImage'].replace(",","\\,")
+					cg_csv.write(f'''{collection['id']},{collection['type']},{collection['displayName']},"{banner}",{imagecheck}\n''')
 			if not imagecheck:
 				with open(os.path.expanduser('~/Desktop/cg_check.csv'),'a') as cg_csv:
 					banner = collection['cgBannerImage'].replace(",","\\,")
