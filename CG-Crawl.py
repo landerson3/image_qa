@@ -110,8 +110,16 @@ class rh_atg_wrapper():
 		return res
 
 	def check_category_product_images(self, category_id:str):
+		return res
+
+	def check_category_product_images(self, category_id:str):
 		prods = self.get_category_products(category_id)
 		for prod in prods:
+			alt_images = self.check_product_image(prod['id'])
+			for image in alt_images:
+				yield (prod['id'],('unconfigured',),image['imageUrl'], image['imageExists'])
+			if self.get_product_info(prod['id'])['colorizeInfo']['colorizable'] == False:
+				continue
 			alt_images = self.check_product_image(prod['id'])
 			for image in alt_images:
 				yield (prod['id'],('unconfigured',),image['imageUrl'], image['imageExists'])
@@ -121,11 +129,16 @@ class rh_atg_wrapper():
 			opt_permutes = self.option_permutations(options)
 			for configuration in opt_permutes:
 				image = self.get_product_images(prod['id'],configuration)
+				image = self.get_product_images(prod['id'],configuration)
 				yield (prod['id'],
 		   			configuration,
 		   			image,
 	   				self.image_exist(image)
+		   			configuration,
+		   			image,
+	   				self.image_exist(image)
 					) 
+			
 
 	def get_category_products(self, category_id: str) -> list:
 		# take a category_ID and return all underlying products		
@@ -138,55 +151,20 @@ class rh_atg_wrapper():
 					result.append(item)
 		return result
 	
-	def product_image_check(self, parent_collection_id: str|list = tuple(reversed(LEFT_NAVS)), is_child = False) -> None:
-		## get all of the product IDs, then get all of the option permutes, then get the images w/ threading
-		if not hasattr(self, 'products'):
-			self.products = [] # set a container for the total list of products
+	def product_image_check(self, parent_collection_id: str|list = tuple(reversed(LEFT_NAVS))) -> None:
 		if type(parent_collection_id) in (list,tuple):
-			for id in parent_collection_id[:2]:
-				self.product_image_check(id, is_child=True)
+			for id in parent_collection_id:
+				self.product_image_check(id)
 		else:
-			# get a list of all of the product ids;
-			# then make a list of all of the options; remove dupes; 
-			for i in self.get_category_products(parent_collection_id):
-				id = i['id']
-				if id in self.products: continue
-				self.products.append(id)
-		if not is_child:
-			# get the options for the products
-			prod_options = []
-			for prodId in self.products:
-				prod_options.append(
-					{
-					'id' : prodId,
-					'options' : self.option_permutations(self.get_product_options(prodId))
-					}
-				)
-			for prod in prod_options:
-				prod['images'] = []
-				#  populate colorization
-				for option in prod['options']:
-					prod['images'].append(self.get_product_images(prod['id'], option))
-				# populate the static imagery
-				for image in self.get_product_info(prod['id'])['alternateImages']:
-					if image not in prod['images']:
-						prod['images'].append(image)
-
-			for prod in prod_options:
-				for image in prod['images']:
-					while threading.active_count() > 50: continue
-					threading.Thread(target = self.write_image_data, args = (prod,image)).start()
-	
-	def write_image_data(self, prod, image):
-		with open(os.path.expanduser(f"~/Desktop/product_image_check.csv"),"a") as csv:
-			_id = prod['id']
-			if type(image) == dict:
-				_image = image['imageUrl']
-			else:
-				_image = image
-			_exists = self.image_exist(image)
-			line = f'''{_id},"{_image}",{_exists}\n'''
-			csv.write(line)
+			print(parent_collection_id, flush = True)
+			for i in self.check_category_product_images(parent_collection_id):
+				with open(os.path.expanduser("~/Desktop/product_image_check.csv"),"a") as csv:
+					_id = i[0]
+					_configuration = ",".join(i[1])
+					_image = i[2]
+					_exists = i[3]
+					line = f'''{_id},"{_configuration}",{_image},{_exists}\n'''
+					csv.write(line)
 
 
 		'''
@@ -242,7 +220,7 @@ class rh_atg_wrapper():
 
 rh = rh_atg_wrapper()
 rh.product_image_check()
-# rh.cg_check()
+rh.cg_check()
 
 
 # prods = rh.get_category_products(LEFT_NAVS[0])
