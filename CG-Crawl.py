@@ -1,4 +1,4 @@
-import requests, time, os, itertools, re, threading
+import requests, time, os, re, threading
 import logging
 logging.basicConfig(filename="image_qa.log", level = logging.DEBUG)
 
@@ -257,5 +257,5 @@ class rh_atg_wrapper():
 					cg_csv.write(f'''{collection['id']},{collection['type']},{collection['displayName']},"{banner}",{imagecheck}\n''')
 
 rh = rh_atg_wrapper()
-# rh.product_image_check()
+rh.product_image_check()
 rh.cg_check()
