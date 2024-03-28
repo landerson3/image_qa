@@ -1,4 +1,7 @@
-import requests, time, os, re, threading
+# deprecated
+
+
+'''import requests, time, os, re, threading
 import logging
 logging.basicConfig(filename="image_qa.log", level = logging.DEBUG)
 
@@ -175,7 +178,12 @@ class rh_atg_wrapper():
 				# threading.Thread(target = self._thread_prod_image_check, args = (prod,parent_collection_id)).start()
 				self._thread_prod_image_check(prod, colx_for_write=parent_collection_id)
 
+<<<<<<< HEAD
 	def _thread_prod_image_check(self,prod, colx_for_write = ''):
+=======
+	def _thread_prod_image_check(self,prod, colx_for_write = '') -> None:
+		if options == None: return
+>>>>>>> 4bcef369c39aeb0701d8481a8d5f027147217505
 		options = self.get_product_options(prod['id'])
 		prod_threads = []
 		if 'images' not in prod:
@@ -190,7 +198,11 @@ class rh_atg_wrapper():
 			thd.join()
 		prod_threads = []
 		for image in prod['images']:
+<<<<<<< HEAD
 			while threading.active_count() > 100: continue
+=======
+			while threading.active_count() > 200: continue
+>>>>>>> 4bcef369c39aeb0701d8481a8d5f027147217505
 			prod_threads.append(
 				threading.Thread(target = self.write_image_data, args = (prod,image, colx_for_write)).start()
 			)
@@ -210,12 +222,22 @@ class rh_atg_wrapper():
 		
 
 	def write_image_data(self, prod, image, collection = ''):
+<<<<<<< HEAD
+=======
+		if image == None: return
+		if type(collection) in (list, tuple) or len(collection)>20:
+			collection = 'mass_update'
+>>>>>>> 4bcef369c39aeb0701d8481a8d5f027147217505
 		with open(os.path.expanduser(f"~/Desktop/product_image_check_{collection}.csv"),"a") as csv:
 			_id = prod['id']
 			if type(image) == dict:
 				_image = image['imageUrl']
 			else:
 				_image = image
+<<<<<<< HEAD
+=======
+			
+>>>>>>> 4bcef369c39aeb0701d8481a8d5f027147217505
 			if 'rhir' in _image:
 				pass
 			if 'image_options' in prod:
@@ -258,4 +280,4 @@ class rh_atg_wrapper():
 
 rh = rh_atg_wrapper()
 rh.product_image_check()
-rh.cg_check()
+rh.cg_check()'''
