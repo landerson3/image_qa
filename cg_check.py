@@ -1,5 +1,6 @@
 import os, sys
-import datetime
+import datetime, logging
+logging.basicConfig(filename='cg_check.log',level = logging.DEBUG)
 sys.path.insert(0,os.path.expanduser('~/'))
 from rh_atg_api import rh_atg_api
 from box_api import box_api_class
