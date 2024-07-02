@@ -2,7 +2,10 @@
 # export should be as tab delimited doc
 
 
-import threading, requests, re, os
+import threading, requests, re, os, sys
+sys.path.insert(0,os.path.expanduser('~'))
+from gx_api import galaxy_api_class
+
 
 
 def get_prod_images(prodid):
@@ -37,8 +40,19 @@ def s7_file_exists(filename:str) -> bool:
 	pass
 
 ## add functionality to pull image list from GX
-def get_gx_final(filename:str) -> str:
-	'''takes a filename and returns the posix path for the file'''
+def get_gx_files() -> list:
+	'''returns a list of records from galaxy that meet the specified hard-coded params'''
+	p = {
+		'query':[
+			{
+			'c_WA_Launch_Date_Earliest' : f'>={date}',
+			'wm_Pickup_Source':'*',
+			'omit' : 'false'
+			},
+		]
+		}
+	gx = galaxy_api_class.gx_api()
+	gx.find_records(p)
 	pass
 
 ## add functionality to check if file is in BCC
